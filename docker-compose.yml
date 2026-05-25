@@ -1,0 +1,42 @@
+services:
+  ventas-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ventas-api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_ENDPOINT: ventas-db
+      DB_PORT: 3306
+      DB_NAME: ventas_db
+      DB_USERNAME: ventas_user
+      DB_PASSWORD: ventas_pass
+    depends_on:
+      - ventas-db
+    networks:
+      - ventas-network
+    restart: unless-stopped
+
+  ventas-db:
+    image: mysql:8.0
+    container_name: ventas-db
+    environment:
+      MYSQL_DATABASE: ventas_db
+      MYSQL_USER: ventas_user
+      MYSQL_PASSWORD: ventas_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ventas_db_data:/var/lib/mysql
+    networks:
+      - ventas-network
+    restart: unless-stopped
+
+volumes:
+  ventas_db_data:
+
+networks:
+  ventas-network:
+    driver: bridge
